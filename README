@@ -1,4 +1,5 @@
 Twitter Demo
+http://railstwitterdemo.herokuapp.com/
 
 A Rails app where a user can mass follow and mass unfollow people on Twitter.
 
@@ -31,6 +32,3 @@ Twitter API Keys and Such:
 
      * TWITTER_CONSUMER_KEY
      * TWITTER_CONSUMER_SECRET
-     * TWITTER_ACCESS_TOKEN
-     * TWITTER_ACCESS_TOKEN_SECRET
-
