@@ -35,4 +35,5 @@ group :test do
   gem 'turn', '0.8.2', :require => false
   gem 'rspec-rails', '2.7.0'
   gem 'webrat', '0.7.3'
+  gem 'sqlite3', '1.3.5'
 end
