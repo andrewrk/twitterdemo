@@ -1,4 +1,6 @@
 Twitterdemo::Application.routes.draw do
+    match '/search' => 'main#search'
+    
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -46,9 +48,7 @@ Twitterdemo::Application.routes.draw do
   #     resources :products
   #   end
 
-  # You can have the root of your site routed with "root"
-  # just remember to delete public/index.html.
-  # root :to => 'welcome#index'
+    root :to => 'main#home'
 
   # See how all your routes lay out with "rake routes"
 

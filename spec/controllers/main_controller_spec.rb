@@ -10,7 +10,7 @@ describe MainController do
 
     describe "GET 'search'" do
         it "should be successful" do
-            get 'search?q=foo%20bar'
+            get 'search'
             response.should be_success
         end
     end

@@ -1,14 +1,27 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Twitterdemo</title>
+  <title>Twitter Demo App</title>
   <%= stylesheet_link_tag    "application" %>
   <%= javascript_include_tag "application" %>
   <%= csrf_meta_tags %>
 </head>
 <body>
-
-<%= yield %>
-
+  <header>
+    <a href="/"><%= image_tag "logo.png", :alt => "Twitter Demo" %></a>
+    <nav>
+      <ul>
+        <li>Grant Access</li>
+        <li>
+          <form action="search" method="get">
+            <input name="q" type="text" placeholder="Search" class="search">
+          </form>
+        </li>
+      </ul>
+    </nav>
+  </header>
+  <section>
+    <%= yield %>
+  </section>
 </body>
 </html>
