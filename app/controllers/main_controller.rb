@@ -127,8 +127,6 @@ class MainController < ApplicationController
         token = cookies[:oauth_token]
         token_secret = cookies[:oauth_token_secret]
 
-        puts "cookie token: " + token
-        puts "param token: " + params[:oauth_token]
         fail if token != params[:oauth_token]
 
         response = makeOAuthPost \
