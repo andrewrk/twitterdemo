@@ -148,4 +148,8 @@ class MainController < ApplicationController
         
         redirect_to '/'
     end
+
+    def ajax_followers
+        render :json => {}
+    end
 end

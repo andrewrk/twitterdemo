@@ -2,6 +2,8 @@ Twitterdemo::Application.routes.draw do
     match '/search' => 'main#search'
     match '/signin/done' => 'main#signin_done'
     match '/signin' => 'main#signin'
+
+    match '/ajax/followers' => 'main#ajax_followers'
     
   # The priority is based upon order of creation:
   # first created -> highest priority.

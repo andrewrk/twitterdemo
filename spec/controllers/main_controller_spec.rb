@@ -29,4 +29,16 @@ describe MainController do
             response.should render_template('signin_err')
         end
     end
+
+    describe "GET 'ajax/followers'" do
+        it "should be successful" do
+            get 'ajax_followers'
+            response.should be_success
+        end
+        it "should return a list of 20 followers" do
+            get 'ajax_followers'
+            followers = ActiveSupport::JSON.decode(response.body)
+            followers.length.should equal 20
+        end
+    end
 end
