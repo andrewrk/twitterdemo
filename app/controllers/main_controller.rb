@@ -1,7 +1,7 @@
 # because we need our url escaping to use '%20', not '+'
 require 'cgi'
 def escape(str)
-    CGI.escape(str).gsub('+', '%20')
+    CGI.escape(str.to_s).gsub('+', '%20')
 end
 
 # returns the OAuth value for the authorization http header
@@ -68,33 +68,51 @@ end
 require 'uri'
 require 'net/http'
 require 'rack'
-def makeOAuthPost(o={})
+def makeOAuthRequest(o={})
     o.reverse_merge! \
+        :method => 'POST', # or GET
         :base_url => nil, # starting with https:// and not including any params
         :post_params => {},
+        :get_params => {},
         :oauth_params => {},
         :token => '', # access token, sometimes we don't have it
-        :token_secret => '' # access token secret, sometimes we don't have it
+        :token_secret => '', # access token secret, sometimes we don't have it
+        :return_format => :query # other options :json, :plain
 
     fail if not o[:base_url].starts_with? 'https://'
+    fail if o[:post_params] != {} and o[:method] != 'POST'
 
     url = URI.parse(o[:base_url])
-    oauth = oAuth(:method => "POST",
-        :params => o[:post_params],
+    oauth = oAuth( \
+        :method => o[:method],
+        :params => o[:post_params].merge(o[:get_params]),
         :oauth_params => o[:oauth_params],
         :base_url => o[:base_url],
         :token => o[:token],
         :token_secret => o[:token_secret])
-    request = Net::HTTP::Post.new(url.path)
-    request['Authorization'] =  oauth
-    request.set_form_data o[:post_params]
+    auth_header_name = 'Authorization'
+    if o[:method] == 'POST'
+        request = Net::HTTP::Post.new(url.path)
+        request[auth_header_name] = oauth
+        request.set_form_data o[:post_params]
+    else # GET
+        request = Net::HTTP::Get.new(url.path)
+        request.add_field(auth_header_name, oauth)
+        request.set_form_data o[:get_params]
+    end
     connection = Net::HTTP.new(url.host, url.port)
     connection.use_ssl = true
     response = connection.start do |http| 
         http.request request
     end
 
-    Rack::Utils.parse_nested_query(response.body)
+    if o[:return_format] == :query
+        return Rack::Utils.parse_nested_query(response.body)
+    elsif o[:return_format] == :json
+        return ActiveSupport::JSON.decode(response.body)
+    else # plain
+        return response.body
+    end
 end
 
 class MainController < ApplicationController
@@ -107,7 +125,7 @@ class MainController < ApplicationController
     end
 
     def signin
-        response = makeOAuthPost \
+        response = makeOAuthRequest \
             :base_url => 'https://api.twitter.com/oauth/request_token',
             :oauth_params => {'oauth_callback' => signin_done_url}
 
@@ -130,7 +148,7 @@ class MainController < ApplicationController
         begin
             fail if token != params[:oauth_token]
 
-            response = makeOAuthPost \
+            response = makeOAuthRequest \
                 :base_url => 'https://api.twitter.com/oauth/access_token',
                 :post_params => {'oauth_verifier' => params[:oauth_verifier]},
                 :token => token,
@@ -149,7 +167,28 @@ class MainController < ApplicationController
         redirect_to '/'
     end
 
-    def ajax_followers
-        render :json => {}
+    # proxy to twitter API
+    def api
+        token = cookies[:oauth_token]
+        token_secret = cookies[:oauth_token_secret]
+
+        if token == nil or token_secret == nil
+            render :json => {:error => "not authenticated"}
+            return
+        end
+
+        get_params = params[:get_params] || '{}'
+        post_params = params[:post_params] || '{}'
+
+        response = makeOAuthRequest \
+            :method => params[:method],
+            :base_url => "https://api.twitter.com/1#{params[:path]}",
+            :get_params => ActiveSupport::JSON.decode(get_params),
+            :post_params => ActiveSupport::JSON.decode(post_params),
+            :token => token,
+            :token_secret => token_secret,
+            :return_format => :json
+        
+        render :json => response
     end
 end

@@ -26,9 +26,19 @@ A Rails app where a user can mass follow and mass unfollow people on Twitter.
    URL.
 
 
-Twitter API Keys and Such:
-
-    App depends on the following environment variables to be set correctly:
+App depends on the following environment variables to be set correctly:
 
      * TWITTER_CONSUMER_KEY
      * TWITTER_CONSUMER_SECRET
+
+
+Questionable Design Decisions:
+
+    * A user is able to _try_ to spoof another user, resulting in twitter
+      thinking that our application is trying to do operations it does not
+      have access to.
+
+    * A user is able to access any and all of twitter's API in our app's name,
+      but only with their access token.
+
+    * No dependency on database - everything is stored client side.
