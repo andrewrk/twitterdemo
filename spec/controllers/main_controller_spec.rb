@@ -14,4 +14,14 @@ describe MainController do
             response.should be_success
         end
     end
+
+    describe "GET 'signin'" do
+        it "should redirect to twitter"
+    end
+
+    describe "GET 'signin/done'" do
+        it "should save a cookie upon success"
+        it "should redirect to home page upon success"
+        it "should display an error message upon error"
+    end
 end

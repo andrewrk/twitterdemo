@@ -11,7 +11,9 @@
     <a href="/"><%= image_tag "logo.png", :alt => "Twitter Demo" %></a>
     <nav>
       <ul>
-        <li>Grant Access</li>
+        <li>
+          <%= link_to "Sign in", signin_path %>
+        </li>
         <li>
           <form action="search" method="get">
             <input name="q" type="text" placeholder="Search" class="search">
