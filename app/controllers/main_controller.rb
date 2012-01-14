@@ -127,13 +127,18 @@ class MainController < ApplicationController
         token = cookies[:oauth_token]
         token_secret = cookies[:oauth_token_secret]
 
-        fail if token != params[:oauth_token]
+        begin
+            fail if token != params[:oauth_token]
 
-        response = makeOAuthPost \
-            :base_url => 'https://api.twitter.com/oauth/access_token',
-            :post_params => {'oauth_verifier' => params[:oauth_verifier]},
-            :token => token,
-            :token_secret => token_secret
+            response = makeOAuthPost \
+                :base_url => 'https://api.twitter.com/oauth/access_token',
+                :post_params => {'oauth_verifier' => params[:oauth_verifier]},
+                :token => token,
+                :token_secret => token_secret
+        rescue
+            render 'signin_err'
+            return
+        end
         
         # save user information to cookie
         cookies.permanent[:oauth_token] = response['oauth_token']

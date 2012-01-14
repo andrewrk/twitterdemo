@@ -26,14 +26,13 @@ gem 'jquery-rails'
 # To use debugger
 # gem 'ruby-debug19', :require => 'ruby-debug'
 
-group :development do
+group :development, :test do
   gem 'rspec-rails', '2.7.0'
 end
 
 group :test do
   # Pretty printed test output
   gem 'turn', '0.8.2', :require => false
-  gem 'rspec-rails', '2.7.0'
   gem 'webrat', '0.7.3'
   gem 'sqlite3', '1.3.5'
 end
