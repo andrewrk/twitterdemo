@@ -60,8 +60,13 @@ module Twitter
         oauth_hash['oauth_signature'] = (HMAC::SHA1.new(signing_key) <<
             signature_base_string).base64digest
 
-        "OAuth " + oauth_hash.map.to_a.sort(&param_then_value).collect{ |k, v|
-            escape(k) + '="' + escape(v) + '"'
+        # percent encode every key and value
+        oauth_params = oauth_hash.map { |k,v| [escape(k), escape(v)] }
+        # sort by encoded key then encoded value
+        oauth_params.sort! &param_then_value
+        # serialize
+        "OAuth " + oauth_params.collect{ |k,v|
+            k + '="' + v + '"'
         }.join(', ')
     end
 
@@ -84,6 +89,15 @@ module Twitter
         fail if o[:post_params] != {} and o[:method] != 'POST'
 
         url = URI.parse(o[:base_url])
+
+        # add get params
+        query = url.path
+        if o[:get_params] != {}
+            query += '?' + o[:get_params].collect{ |param, value|
+                escape(param) + '=' + escape(value)
+            }.join('&')
+        end
+
         oauth = oAuth( \
             :method => o[:method],
             :params => o[:post_params].merge(o[:get_params]),
@@ -93,13 +107,12 @@ module Twitter
             :token_secret => o[:token_secret])
         auth_header_name = 'Authorization'
         if o[:method] == 'POST'
-            request = Net::HTTP::Post.new(url.path)
+            request = Net::HTTP::Post.new(query)
             request[auth_header_name] = oauth
             request.set_form_data o[:post_params]
         else # GET
-            request = Net::HTTP::Get.new(url.path)
+            request = Net::HTTP::Get.new(query)
             request.add_field(auth_header_name, oauth)
-            request.set_form_data o[:get_params]
         end
         connection = Net::HTTP.new(url.host, url.port)
         connection.use_ssl = true
