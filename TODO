@@ -1,5 +1,4 @@
- * The app pulls back a paginated list of people the user is following, with 20
-   results per page – 'followees'
+ * Make the result page look better
  * Next to each followee is a checkbox saying 'unfollow'. At the bottom there
    is a 'submit' button which performs the unfollow actions that the user has
    requested.
@@ -9,6 +8,8 @@
  * Next to each of these search results is a 'follow' checkbox, with a 'submit'
    button at the bottom.
  * make sure we respond to history state pop events
- * look into signed cookies
  * better test coverage
  * figure out how to not hardcode URLs in Javascript
+ * better pagination
+ * support for when more than 5000 followees/followers
+ * look into signed cookies
