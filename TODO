@@ -1,3 +1,4 @@
+ * make sure we respond to history state pop events
  * look into signed cookies
  * better test coverage
  * figure out how to not hardcode URLs in Javascript
