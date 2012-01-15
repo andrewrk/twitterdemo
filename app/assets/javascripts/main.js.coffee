@@ -6,7 +6,7 @@
 
 home_title = document.title
 
-twitter =
+twitter_init =
     signed_in: false
     user_id: null
     screen_name: null
@@ -14,6 +14,8 @@ twitter =
     friends: null
     users: {} # cache of user data, indexed by id
     unfollow_users: {} # users we want to unfollow (id => true/undefined)
+
+twitter = $.extend({}, twitter_init)
 
 home_data =
     current_page: 0
@@ -57,46 +59,52 @@ pagination_layout = '''
 </div>
 '''
 friends_template = Jst.compile("""
-<h1>Followees</h1>
-<div class="followees">
-<% if (friends.length > 0) { %>
-  #{pagination_layout}
-  <% for (var i = 0; i < friends.length; i++) { %>
-    <div class="followee<%= i % 2 === 0 ? '' : ' odd' %>">
-      <div class="basic-info span-3">
-        <img alt="" src="<%= friends[i].profile_image_url %>">
-        <div>
-          <a href="https://twitter.com/#!/<%= friends[i].screen_name %>"><%= friends[i].name || friends[i].screen_name %></a>
+<% if (friends) { %>
+  <h1>Followees</h1>
+  <div class="followees">
+  <% if (friends.length > 0) { %>
+    #{pagination_layout}
+    <% for (var i = 0; i < friends.length; i++) { %>
+      <div class="followee<%= i % 2 === 0 ? '' : ' odd' %>">
+        <div class="basic-info span-3">
+          <img alt="" src="<%= friends[i].profile_image_url %>">
+          <div>
+            <a
+              href="https://twitter.com/#!/<%= friends[i].screen_name %>"><%=
+                  friends[i].name || friends[i].screen_name %></a>
+          </div>
         </div>
-      </div>
-      <div class="description span-12">
-        <% if (friends[i].description) { %>
-          <%= friends[i].description  %>
-        <% } else { %>
-          No description
-        <% } %>
-      </div>
-      <div class="actions span-3">
-        <input
-          type="checkbox"
-          data-id="<%= friends[i].id %>"
-          class="unfollow"
-          id="unfollow-<%= friends[i].id %>"
-          <% if (unfollow_users[friends[i].id]) { %>
-            checked="checked"
+        <div class="description span-12">
+          <% if (friends[i].description) { %>
+            <%= friends[i].description  %>
+          <% } else { %>
+            No description
           <% } %>
-        >
-        <label for="unfollow-<%= friends[i].id %>">Unfollow</label>
+        </div>
+        <div class="actions span-3">
+          <input
+            type="checkbox"
+            data-id="<%= friends[i].id %>"
+            class="unfollow"
+            id="unfollow-<%= friends[i].id %>"
+            <% if (unfollow_users[friends[i].id]) { %>
+              checked="checked"
+            <% } %>
+          >
+          <label for="unfollow-<%= friends[i].id %>">Unfollow</label>
+        </div>
+        <div class="clear"></div>
       </div>
-      <div class="clear"></div>
-    </div>
+    <% } %>
+    <input type="button" value="Submit" class="submit">
+    #{pagination_layout}
+  <% } else { %>
+    <p>You're not following anybody.</p>
   <% } %>
-  <input type="button" value="Submit" class="submit">
-  #{pagination_layout}
+  </div>
 <% } else { %>
-  <p>You're not following anybody.</p>
+  <p>Not signed in</p>
 <% } %>
-</div>
 """)
 
 getFriends = ->
@@ -134,21 +142,21 @@ requestCurrentPage = ->
             for user in data
                 twitter.users[user.id] = user
 
-            updateHomePage()
+            updatePage()
 
 
 updateHomePage = ->
-    updatePage()
-
     # prepare data
-    start = home_data.current_page * home_data.results_per_page
-    end = start + home_data.results_per_page
-    
-    context =
-        friends: (twitter.users[id] for id in twitter.friends.ids[start...end])
-        has_prev: start > 0
-        has_next: end < twitter.friends.ids.length
-        unfollow_users: twitter.unfollow_users
+    if twitter.friends?
+        start = home_data.current_page * home_data.results_per_page
+        end = start + home_data.results_per_page
+        context =
+            friends: (twitter.users[id] for id in twitter.friends.ids[start...end])
+            has_prev: start > 0
+            has_next: end < twitter.friends.ids.length
+            unfollow_users: twitter.unfollow_users
+    else
+        context = {friends: null}
 
     # render templates
     content = $("#content")
@@ -163,7 +171,7 @@ updateHomePage = ->
     content.find(".nav-prev").on 'click', (event) ->
         home_data.current_page -= 1
         # don't need to request old pages, they're already cached
-        updateHomePage()
+        updatePage()
         return false
 
     content.find(".unfollow").on 'change', (event) ->
@@ -209,10 +217,13 @@ updatePage = ->
     $("#nav").html(Jst.evaluate(nav_template, twitter))
 
     # add hooks
-    $("#signout").on('click', (event) ->
+    $("#signout").on 'click', (event) ->
         # delete cookies
         $.cookie('user_id', null)
         $.cookie('screen_name', null)
+
+        # delete local cache
+        twitter = $.extend({}, twitter_init)
 
         # set url to home page
         history.pushState({}, '', "/")
@@ -221,7 +232,8 @@ updatePage = ->
         # re-render templates
         updatePage()
         return false
-    )
+
+    updateHomePage()
 
 $(document).ready( ->
     updatePage()
