@@ -60,7 +60,9 @@ class HomePage extends RTD.Page
                 results: (@users[id] for id in @friends.ids[start...end])
                 has_prev: start > 0
                 has_next: end < @friends.ids.length
-                unfollow_users: @unfollow_users
+                action_checked: @unfollow_users
+                action_label: "Unfollow"
+                label: "Search Results"
         else
             context =
                 results: null
@@ -82,7 +84,7 @@ class HomePage extends RTD.Page
             @render()
             return false
 
-        content.find(".unfollow").on 'change', (event) =>
+        content.find(".action").on 'change', (event) =>
             checkbox = $(event.target)
             id = checkbox.data('id')
             is_checked = checkbox.is(':checked')

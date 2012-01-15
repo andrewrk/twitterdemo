@@ -16,12 +16,12 @@ RTD.layouts.pagination = """
 
 RTD.layouts.results = Jst.compile """
 <% if (results) { %>
-  <h1>Followees</h1>
-  <div class="followees">
+  <h1><%= label %></h1>
+  <div class="profiles">
   <% if (results.length > 0) { %>
     #{RTD.layouts.pagination}
     <% for (var i = 0; i < results.length; i++) { %>
-      <div class="followee<%= i % 2 === 0 ? '' : ' odd' %>">
+      <div class="profile<%= i % 2 === 0 ? '' : ' odd' %>">
         <div class="basic-info span-3">
           <img alt="" src="<%= results[i].profile_image_url %>">
           <div>
@@ -41,13 +41,13 @@ RTD.layouts.results = Jst.compile """
           <input
             type="checkbox"
             data-id="<%= results[i].id %>"
-            class="unfollow"
-            id="unfollow-<%= results[i].id %>"
-            <% if (unfollow_users[results[i].id]) { %>
+            class="action"
+            id="action-<%= results[i].id %>"
+            <% if (action_checked[results[i].id]) { %>
               checked="checked"
             <% } %>
           >
-          <label for="unfollow-<%= results[i].id %>">Unfollow</label>
+          <label for="action-<%= results[i].id %>"><%= action_label %></label>
         </div>
         <div class="clear"></div>
       </div>
