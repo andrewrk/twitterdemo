@@ -1,6 +1,11 @@
 // Place all the styles related to the main controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+
+h1 {
+    margin-top: 0.5em;
+}
+
 nav {
     float: right;
     height: 100%;
@@ -16,4 +21,32 @@ nav {
 .avatar-sm {
     width: 32px;
     vertical-align: middle;
+}
+
+.followees {
+    width: 720px;
+
+    .followee {
+        .basic-info, .description, .actions {
+            float: left;
+        }
+        .basic-info {
+            text-align: center;
+            padding-bottom: 4px;
+
+            img {
+                width: 48px;
+            }
+        }
+        .description {
+        }
+    }
+
+    .odd {
+        background-color: #f3f3f3;
+    }
+
+    .paginator {
+        margin: 16px 0;
+    }
 }

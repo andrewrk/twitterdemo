@@ -46,7 +46,7 @@ nav_template = Jst.compile('''
 ''')
 
 pagination_layout = '''
-<div>
+<div class="paginator">
   <% if (has_prev) { %>
     <a href="#" class="nav-prev">&laquo; Prev</a>
   <% } %>
@@ -57,29 +57,32 @@ pagination_layout = '''
 '''
 friends_template = Jst.compile("""
 <h1>Followees</h1>
+<div class="followees">
 <% if (friends.length > 0) { %>
   #{pagination_layout}
   <% for (var i = 0; i < friends.length; i++) { %>
-    <div>
-      <div>
+    <div class="followee<%= i % 2 === 0 ? '' : ' odd' %>">
+      <div class="basic-info span-3">
         <img alt="" src="<%= friends[i].profile_image_url %>">
         <div>
           <a href="https://twitter.com/#!/<%= friends[i].screen_name %>"><%= friends[i].name || friends[i].screen_name %></a>
         </div>
       </div>
-      <div>
-        <%= friends[i].description %>
+      <div class="description span-12">
+        <%= friends[i].description || '&nbsp;' %>
       </div>
-      <div>
+      <div class="actions span-3">
         <input type="checkbox" class="unfollow" id="unfollow-<%= friends[i].id %>">
         <label for="unfollow-<%= friends[i].id %>">Unfollow</label>
       </div>
+      <div class="clear"></div>
     </div>
   <% } %>
   #{pagination_layout}
 <% } else { %>
   <p>You're not following anybody.</p>
 <% } %>
+</div>
 """)
 
 getFriends = ->
@@ -98,10 +101,9 @@ getFriends = ->
             requestCurrentPage()
     )
 
-requestCurrentPage = (force_update = true) ->
+requestCurrentPage = ->
     start = home_data.current_page * home_data.results_per_page
-    prefetch_count = 2
-    end = start + home_data.results_per_page * prefetch_count
+    end = start + home_data.results_per_page
     friends = twitter.friends.ids[start...end]
     # fetch our user while we're at it
     friends.push(twitter.user_id)
@@ -121,8 +123,7 @@ requestCurrentPage = (force_update = true) ->
             for user in data
                 twitter.users[user.id] = user
 
-            if force_update
-                updateHomePage()
+            updateHomePage()
     )
 
 
@@ -144,14 +145,13 @@ updateHomePage = ->
     # add hooks
     $("#content").find(".nav-next").on('click', ->
         home_data.current_page += 1
-        updateHomePage()
-        requestCurrentPage(false)
+        requestCurrentPage()
         return false
     )
     $("#content").find(".nav-prev").on('click', ->
         home_data.current_page -= 1
-        updateHomePage()
         # don't need to request old pages, they're already cached
+        updateHomePage()
         return false
     )
 
