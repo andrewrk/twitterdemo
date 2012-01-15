@@ -8,13 +8,6 @@ describe MainController do
         end
     end
 
-    describe "GET 'search'" do
-        it "should be successful" do
-            get 'search'
-            response.should be_success
-        end
-    end
-
     describe "GET 'signin'" do
         it "should redirect to twitter" do
             get 'signin'
