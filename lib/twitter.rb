@@ -44,10 +44,11 @@ module Twitter
             [escape(param), escape(value)]
         }
         # sort alphabetically by encoded key, then encoded value
-        signature_params.sort! do |a, b|
+        param_then_value = Proc.new do |a, b|
             first_order = a[0] <=> b[0]
             (first_order == 0) ? a[1] <=> b[1] : first_order
         end
+        signature_params.sort! &param_then_value
         parameter_string = signature_params.collect{ |param, value|
             param + '=' + value
         }.join('&')
@@ -59,8 +60,8 @@ module Twitter
         oauth_hash['oauth_signature'] = (HMAC::SHA1.new(signing_key) <<
             signature_base_string).base64digest
 
-        "OAuth " + oauth_hash.collect{ |param, value|
-            escape(param) + '="' + escape(value) + '"'
+        "OAuth " + oauth_hash.map.to_a.sort(&param_then_value).collect{ |k, v|
+            escape(k) + '="' + escape(v) + '"'
         }.join(', ')
     end
 
@@ -104,10 +105,6 @@ module Twitter
         connection.use_ssl = true
         response = connection.start do |http| 
             http.request request
-        end
-
-        if response.code != '200'
-            return nil
         end
 
         if o[:return_format] == :query
