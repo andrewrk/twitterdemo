@@ -27,6 +27,8 @@ nav {
     width: 720px;
 
     .followee {
+        margin: 4px 0;
+
         .basic-info, .description, .actions {
             float: left;
         }
@@ -52,5 +54,9 @@ nav {
 
     .paginator {
         margin: 16px 0;
+    }
+
+    .submit {
+        float: right;
     }
 }

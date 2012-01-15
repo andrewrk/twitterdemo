@@ -70,7 +70,11 @@ friends_template = Jst.compile("""
         </div>
       </div>
       <div class="description span-12">
-        <%= friends[i].description || '&nbsp;' %>
+        <% if (friends[i].description) { %>
+          <%= friends[i].description  %>
+        <% } else { %>
+          No description
+        <% } %>
       </div>
       <div class="actions span-3">
         <input
@@ -87,6 +91,7 @@ friends_template = Jst.compile("""
       <div class="clear"></div>
     </div>
   <% } %>
+  <input type="button" value="Submit" class="submit">
   #{pagination_layout}
 <% } else { %>
   <p>You're not following anybody.</p>
@@ -95,20 +100,18 @@ friends_template = Jst.compile("""
 """)
 
 getFriends = ->
-    $.ajax(
+    $.ajax
         type: 'POST'
         url: '/api'
         data:
             method: 'GET'
             path: '/friends/ids.json'
-            get_params: JSON.stringify(
+            get_params: JSON.stringify
                 user_id: twitter.user_id
                 cursor: -1
-            )
         success: (data) ->
             twitter.friends = data
             requestCurrentPage()
-    )
 
 requestCurrentPage = ->
     start = home_data.current_page * home_data.results_per_page
@@ -117,23 +120,21 @@ requestCurrentPage = ->
     # fetch our user while we're at it
     friends.push(twitter.user_id)
 
-    $.ajax(
+    $.ajax
         type: 'POST'
         url: '/api'
         data:
             method: 'GET'
             path: '/users/lookup.json'
-            get_params: JSON.stringify(
+            get_params: JSON.stringify
                 user_id: friends.join(',')
                 include_entities: false
-            )
         success: (data) ->
             # merge the results into our cache
             for user in data
                 twitter.users[user.id] = user
 
             updateHomePage()
-    )
 
 
 updateHomePage = ->
@@ -154,23 +155,46 @@ updateHomePage = ->
     content.html(Jst.evaluate(friends_template, context))
     
     # add hooks
-    content.find(".nav-next").on('click', (event) ->
+    content.find(".nav-next").on 'click', (event) ->
         home_data.current_page += 1
         requestCurrentPage()
         return false
-    )
-    content.find(".nav-prev").on('click', (event) ->
+
+    content.find(".nav-prev").on 'click', (event) ->
         home_data.current_page -= 1
         # don't need to request old pages, they're already cached
         updateHomePage()
         return false
-    )
-    content.find(".unfollow").on('change', (event) ->
+
+    content.find(".unfollow").on 'change', (event) ->
         id = $(this).data('id')
         is_checked = $(this).is(':checked')
         twitter.unfollow_users[id] = is_checked
         return false
-    )
+    
+    content.find(".submit").on 'click', (event) ->
+        # unfollow every checked user one by one
+        $(this).hide()
+        for own user_id, unfollow of twitter.unfollow_users
+            if unfollow
+                $.ajax
+                    type: 'POST'
+                    url: '/api'
+                    data:
+                        method: 'POST'
+                        path: '/friendships/destroy.json'
+                        post_params: JSON.stringify
+                            user_id: user_id
+                            include_entities: false
+
+        twitter.unfollow_users = {}
+
+        setTimeout ->
+            home_data.current_page = 0
+            requestCurrentPage()
+        , 1000
+
+        return false
 
 updatePage = ->
     # prepare data
