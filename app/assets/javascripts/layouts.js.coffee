@@ -55,7 +55,7 @@ RTD.layouts.results = Jst.compile """
     <input type="button" value="Submit" class="submit">
     #{RTD.layouts.pagination}
   <% } else { %>
-    <p>You're not following anybody.</p>
+    <p>No results.</p>
   <% } %>
   </div>
 <% } else { %>

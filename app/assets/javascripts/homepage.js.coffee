@@ -62,7 +62,7 @@ class HomePage extends RTD.Page
                 has_next: end < @friends.ids.length
                 action_checked: @unfollow_users
                 action_label: "Unfollow"
-                label: "Search Results"
+                label: "Followees"
         else
             context =
                 results: null

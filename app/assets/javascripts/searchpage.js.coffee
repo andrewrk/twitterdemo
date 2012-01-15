@@ -36,7 +36,7 @@ class SearchPage extends RTD.Page
             context =
                 results: @results
                 has_prev: @current_page > 1
-                has_next: true
+                has_next: @results.length == @results_per_page
                 action_checked: @follow_users
                 action_label: "Follow"
                 label: "Search Results"
