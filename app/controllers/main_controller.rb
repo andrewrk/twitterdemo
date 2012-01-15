@@ -3,7 +3,6 @@ class MainController < ApplicationController
     require 'twitter'
 
     def home
-        @screen_name = cookies[:screen_name]
     end
 
     def search

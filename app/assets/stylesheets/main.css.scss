@@ -1,4 +1,14 @@
 // Place all the styles related to the main controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-
+nav {
+    float: right;
+    height: 100%;
+    margin-top: 20px;
+    ul {
+        li {
+            display: inline;
+            margin-left: 20px;
+        }
+    }
+}

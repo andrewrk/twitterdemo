@@ -13,23 +13,15 @@
   <%= csrf_meta_tags %>
 </head>
 <body>
-  <header>
-    <a href="/"><%= image_tag "logo.png", :alt => "Twitter Demo" %></a>
-    <nav>
-      <ul>
-        <li>
-          <%= link_to "Sign in", signin_path %>
-        </li>
-        <li>
-          <form action="search" method="get">
-            <input name="q" type="text" placeholder="Search" class="search">
-          </form>
-        </li>
-      </ul>
-    </nav>
-  </header>
-  <section>
-    <%= yield %>
-  </section>
+  <div class="container">
+    <header>
+      <a href="/"><%= image_tag "logo.png", :alt => "Twitter Demo" %></a>
+      <nav>
+      </nav>
+    </header>
+    <section>
+      <%= yield %>
+    </section>
+  </div>
 </body>
 </html>

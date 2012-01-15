@@ -6,6 +6,8 @@ A Rails app where a user can mass follow and mass unfollow people on Twitter.
  * A user logs into his/her Twitter account using the Twitter OAuth API. For
    exercise, not relying on Twitter gem or any other Twitter-specific libraries.
 
+ * The user should be able to logout from their Twitter account.
+
  * The app pulls back a paginated list of people the user is following, with 20
    results per page – 'followees'
 
@@ -19,8 +21,6 @@ A Rails app where a user can mass follow and mass unfollow people on Twitter.
 
  * Next to each of these search results is a 'follow' checkbox, with a 'submit'
    button at the bottom.
-
- * The user should be able to logout from their Twitter account.
 
  * Any state changes should be reflected in the hash part of the current page's
    URL.
