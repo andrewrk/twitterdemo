@@ -9,8 +9,8 @@ class Err404Page extends RTD.Page
 </p>
 '''
 
-    constructor: ->
-        super()
+    constructor: (params) ->
+        super(params)
         @base_title = "Page not found - " + @base_title
 
     render: ->

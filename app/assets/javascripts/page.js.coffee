@@ -36,7 +36,7 @@ class Page
         if @users[@user_id]?
             @avatar = @users[@user_id].profile_image_url
 
-    constructor: ->
+    constructor: (params) ->
         @signed_in = false
         @user_id = null
         @screen_name = null

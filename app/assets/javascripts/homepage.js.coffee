@@ -101,8 +101,8 @@ class HomePage extends RTD.Page
                 @friends = data
                 @_requestCurrentPage()
 
-    constructor: ->
-        super()
+    constructor: (params) ->
+        super(params)
 
         @current_page = 0
         @results_per_page = 20
@@ -125,7 +125,9 @@ class HomePage extends RTD.Page
                 has_next: end < @friends.ids.length
                 unfollow_users: @unfollow_users
         else
-            context = {friends: null}
+            context =
+                friends: null
+                signed_in: @signed_in
 
         # render templates
         content = $("#content")

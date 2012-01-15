@@ -8,14 +8,22 @@ routes =
     '/': RTD.HomePage
     '/search': RTD.SearchPage
 
+parseQuery = (query) ->
+    obj = {}
+    if not query?
+        return obj
+    for [param, val] in (valset.split('=') for valset in query.split('&'))
+        obj[unescape(param)] = unescape(val)
+    
+    return obj
+
 handleNewPage = (address) ->
     # choose the correct page to load
     [path, query] = address.split('?')
-    
+
     PageClass = routes[path] or RTD.Err404Page
 
-    delete page
-    page = new PageClass
+    page = new PageClass(parseQuery(query))
     page.render()
 
 $.address.change (event) -> handleNewPage(event.value)
