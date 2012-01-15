@@ -1,33 +1,8 @@
 #= require jquery.cookie
-#= require jst-0.5.0
+#= require layouts
 
 base_title = document.title
 class Page
-    nav_template = Jst.compile('''
-<ul>
-  <% if (signed_in) { %>
-    <% if (avatar) { %>
-      <li>
-        <img alt="" src="<%= avatar %>" class="avatar-sm">
-      </li>
-    <% } %>
-    <li>
-      <a href="https://twitter.com/#!/<%= screen_name %>"><%= screen_name %></a>
-    </li>
-    <li>
-      <a class="signout" href="#">Sign out</a>
-    </li>
-  <% } else { %>
-    <li>
-      <a href="/signin">Sign in</a>
-    </li>
-  <% } %>
-  <li>
-    <input name="q" type="text" placeholder="Search" class="search">
-  </li>
-</ul>
-''')
-
     _cacheSignInState: ->
         @user_id = $.cookie('user_id')
         @screen_name = $.cookie('screen_name')
@@ -43,6 +18,7 @@ class Page
         @avatar = null
         @users = {} # cache of user data, indexed by id
         @base_title = base_title
+        @query = '' # search query
 
         @_cacheSignInState()
 
@@ -52,7 +28,7 @@ class Page
 
         # render templates
         nav = $("#nav")
-        nav.html(Jst.evaluate(nav_template, this))
+        nav.html(Jst.evaluate(RTD.layouts.nav, this))
 
         # add hooks
         nav.find(".signout").on 'click', (event) =>
@@ -72,5 +48,4 @@ class Page
                 return false
             return true
 
-window.RTD ||= {}
 RTD.Page = Page

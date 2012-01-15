@@ -1,69 +1,6 @@
 #= require page
 
 class HomePage extends RTD.Page
-    pagination_layout = '''
-<div class="paginator">
-  <% if (has_prev) { %>
-    <a href="#" class="nav-prev">&laquo; Prev</a>
-  <% } %>
-  <% if (has_next) { %>
-    <a href="#" class="nav-next">Next &raquo;</a>
-  <% } %>
-</div>
-'''
-    friends_template = Jst.compile """
-<% if (friends) { %>
-  <h1>Followees</h1>
-  <div class="followees">
-  <% if (friends.length > 0) { %>
-    #{pagination_layout}
-    <% for (var i = 0; i < friends.length; i++) { %>
-      <div class="followee<%= i % 2 === 0 ? '' : ' odd' %>">
-        <div class="basic-info span-3">
-          <img alt="" src="<%= friends[i].profile_image_url %>">
-          <div>
-            <a
-              href="https://twitter.com/#!/<%= friends[i].screen_name %>"><%=
-                  friends[i].name || friends[i].screen_name %></a>
-          </div>
-        </div>
-        <div class="description span-12">
-          <% if (friends[i].description) { %>
-            <%= friends[i].description  %>
-          <% } else { %>
-            No description
-          <% } %>
-        </div>
-        <div class="actions span-3">
-          <input
-            type="checkbox"
-            data-id="<%= friends[i].id %>"
-            class="unfollow"
-            id="unfollow-<%= friends[i].id %>"
-            <% if (unfollow_users[friends[i].id]) { %>
-              checked="checked"
-            <% } %>
-          >
-          <label for="unfollow-<%= friends[i].id %>">Unfollow</label>
-        </div>
-        <div class="clear"></div>
-      </div>
-    <% } %>
-    <input type="button" value="Submit" class="submit">
-    #{pagination_layout}
-  <% } else { %>
-    <p>You're not following anybody.</p>
-  <% } %>
-  </div>
-<% } else { %>
-  <% if (signed_in) { %>
-    <p>Loading...</p>
-  <% } else { %>
-    <p>Not signed in</p>
-  <% } %>
-<% } %>
-"""
-
     _requestCurrentPage: ->
         start = @current_page * @results_per_page
         end = start + @results_per_page
@@ -120,18 +57,18 @@ class HomePage extends RTD.Page
             start = @current_page * @results_per_page
             end = start + @results_per_page
             context =
-                friends: (@users[id] for id in @friends.ids[start...end])
+                results: (@users[id] for id in @friends.ids[start...end])
                 has_prev: start > 0
                 has_next: end < @friends.ids.length
                 unfollow_users: @unfollow_users
         else
             context =
-                friends: null
+                results: null
                 signed_in: @signed_in
 
         # render templates
         content = $("#content")
-        content.html(Jst.evaluate(friends_template, context))
+        content.html(Jst.evaluate(RTD.layouts.results, context))
         
         # add hooks
         content.find(".nav-next").on 'click', (event) =>
