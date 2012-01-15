@@ -13,6 +13,7 @@ twitter =
     avatar: null
     friends: null
     users: {} # cache of user data, indexed by id
+    unfollow_users: {} # users we want to unfollow (id => true/undefined)
 
 home_data =
     current_page: 0
@@ -72,7 +73,15 @@ friends_template = Jst.compile("""
         <%= friends[i].description || '&nbsp;' %>
       </div>
       <div class="actions span-3">
-        <input type="checkbox" class="unfollow" id="unfollow-<%= friends[i].id %>">
+        <input
+          type="checkbox"
+          data-id="<%= friends[i].id %>"
+          class="unfollow"
+          id="unfollow-<%= friends[i].id %>"
+          <% if (unfollow_users[friends[i].id]) { %>
+            checked="checked"
+          <% } %>
+        >
         <label for="unfollow-<%= friends[i].id %>">Unfollow</label>
       </div>
       <div class="clear"></div>
@@ -138,20 +147,28 @@ updateHomePage = ->
         friends: (twitter.users[id] for id in twitter.friends.ids[start...end])
         has_prev: start > 0
         has_next: end < twitter.friends.ids.length
+        unfollow_users: twitter.unfollow_users
 
     # render templates
-    $("#content").html(Jst.evaluate(friends_template, context))
+    content = $("#content")
+    content.html(Jst.evaluate(friends_template, context))
     
     # add hooks
-    $("#content").find(".nav-next").on('click', ->
+    content.find(".nav-next").on('click', (event) ->
         home_data.current_page += 1
         requestCurrentPage()
         return false
     )
-    $("#content").find(".nav-prev").on('click', ->
+    content.find(".nav-prev").on('click', (event) ->
         home_data.current_page -= 1
         # don't need to request old pages, they're already cached
         updateHomePage()
+        return false
+    )
+    content.find(".unfollow").on('change', (event) ->
+        id = $(this).data('id')
+        is_checked = $(this).is(':checked')
+        twitter.unfollow_users[id] = is_checked
         return false
     )
 
@@ -168,7 +185,7 @@ updatePage = ->
     $("#nav").html(Jst.evaluate(nav_template, twitter))
 
     # add hooks
-    $("#signout").on('click', ->
+    $("#signout").on('click', (event) ->
         # delete cookies
         $.cookie('user_id', null)
         $.cookie('screen_name', null)

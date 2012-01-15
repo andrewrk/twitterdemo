@@ -7,6 +7,7 @@
  * Next to each of these search results is a 'follow' checkbox, with a 'submit'
    button at the bottom.
  * make sure we respond to history state pop events
+ * figure out how to organize javascript and templates
  * better test coverage
  * pre-fetch next page of results for smooth experience
  * figure out how to not hardcode URLs in Javascript
