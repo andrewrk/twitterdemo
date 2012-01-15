@@ -1,10 +1,4 @@
- * Additionally, at the top of the page there is a search box. Entering a
-   search term into the box pulls back Twitter profiles whose messages or
-   profile match the search term.
- * Next to each of these search results is a 'follow' checkbox, with a 'submit'
-   button at the bottom.
- * make sure we respond to history state pop events
- * figure out how to organize javascript and templates
+ * Fix history managment, especially with prev/next buttons
  * better test coverage
  * better experience upon clicking the submit button - instead of timeout,
    actually analyze the success/failure results that come back.
