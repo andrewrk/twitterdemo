@@ -1,4 +1,3 @@
- * Fix history managment, especially with prev/next buttons
  * better test coverage
  * better experience upon clicking the submit button - instead of timeout,
    actually analyze the success/failure results that come back.
