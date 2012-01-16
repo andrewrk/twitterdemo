@@ -18,15 +18,19 @@ class SearchPage extends RTD.Page
 
     constructor: (params) ->
         super(params)
+
         @base_title = "Search - " + @base_title
         @results_per_page = 20
-        @current_page = 1
+        @current_page = parseInt(params.page) || 0
         @query = params.q
         @terms = @query.split(/\s+/)
         @results = null
         @follow_users = {} # users we want to follow
 
         @_requestSearch()
+
+    canonicalUrl: ->
+        "/#/search?q=#{escape(@query)}&page=#{@current_page}"
 
     render: ->
         super()
@@ -54,11 +58,13 @@ class SearchPage extends RTD.Page
         content.find(".nav-next").on 'click', (event) =>
             @current_page += 1
             @_requestSearch()
+            history?.pushState {}, '', @canonicalUrl()
             return false
 
         content.find(".nav-prev").on 'click', (event) =>
             @current_page -= 1
             @_requestSearch()
+            history?.pushState {}, '', @canonicalUrl()
             return false
 
         content.find(".action").on 'change', (event) =>
@@ -90,7 +96,6 @@ class SearchPage extends RTD.Page
             , 1000
 
             return false
-
 
 
 RTD.SearchPage = SearchPage

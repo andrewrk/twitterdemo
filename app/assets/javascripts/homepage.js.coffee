@@ -41,13 +41,16 @@ class HomePage extends RTD.Page
     constructor: (params) ->
         super(params)
 
-        @current_page = 0
+        @current_page = parseInt(params.page) || 0
         @results_per_page = 20
         @friends = null
         @unfollow_users = {} # users we want to unfollow (id => true/not true)
 
         if @signed_in
             @_requestFriends()
+
+    canonicalUrl: ->
+        "/#/?page=" + @current_page
 
     render: ->
         super()
@@ -76,12 +79,13 @@ class HomePage extends RTD.Page
         content.find(".nav-next").on 'click', (event) =>
             @current_page += 1
             @_requestCurrentPage()
+            history?.pushState {}, '', @canonicalUrl()
             return false
 
         content.find(".nav-prev").on 'click', (event) =>
             @current_page -= 1
-            # don't need to request old pages, they're already cached
-            @render()
+            @_requestCurrentPage()
+            history?.pushState {}, '', @canonicalUrl()
             return false
 
         content.find(".action").on 'change', (event) =>
