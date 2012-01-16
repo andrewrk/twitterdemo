@@ -5,17 +5,13 @@ class MainController < ApplicationController
   def home
   end
 
-  def search
-    render 'home'
-  end
-
   def signin
     # get request token from twitter
     response = Twitter.makeOAuthRequest \
       :base_url => 'https://api.twitter.com/oauth/request_token',
       :oauth_params => {'oauth_callback' => signin_done_url}
 
-    if response == nil or response['oauth_callback_confirmed'] != 'true'
+    if response.blank? or response['oauth_callback_confirmed'] != 'true'
       render 'signin_err'
       return
     end
@@ -25,7 +21,7 @@ class MainController < ApplicationController
     cookies.permanent[:oauth_token] = token
     cookies.permanent[:oauth_token_secret] = response['oauth_token_secret']
     
-    redirect_to 'https://api.twitter.com/oauth/authorize?oauth_token='+token
+    redirect_to "https://api.twitter.com/oauth/authorize?oauth_token=#{token}"
   end
 
   def signin_done
@@ -33,7 +29,7 @@ class MainController < ApplicationController
     token = cookies[:oauth_token]
     token_secret = cookies[:oauth_token_secret]
 
-    if token != params[:oauth_token] or token == nil or token_secret == nil
+    if token != params[:oauth_token] or token.blank? or token_secret.blank?
       render 'signin_err'
       return
     end
@@ -44,10 +40,7 @@ class MainController < ApplicationController
       :token => token,
       :token_secret => token_secret
 
-    if response == nil
-      render 'signin_err'
-      return
-    end
+    render 'signin_err' and return if response.blank?
     
     # save user information to cookie
     cookies.permanent[:oauth_token] = response['oauth_token']
@@ -55,7 +48,7 @@ class MainController < ApplicationController
     cookies.permanent[:user_id] = response['user_id']
     cookies.permanent[:screen_name] = response['screen_name']
     
-    redirect_to '/'
+    redirect_to root_path
   end
 
   # proxy to twitter API
@@ -63,7 +56,7 @@ class MainController < ApplicationController
     token = cookies[:oauth_token]
     token_secret = cookies[:oauth_token_secret]
 
-    if token == nil or token_secret == nil
+    if token.blank? or token_secret.blank?
       render :json => {:error => "not authenticated"}
       return
     end

@@ -3,22 +3,22 @@ require 'spec_helper'
 describe MainController do
   describe "GET 'home'" do
     it "should be successful" do
-      get 'home'
+      get :home
       response.should be_success
     end
   end
 
   describe "GET 'signin'" do
     it "should redirect to twitter" do
-      get 'signin'
+      get :signin
       response.code.should == '302'
-      (response.redirect_url.start_with? 'https://api.twitter.com/oauth/authorize').should equal true
+      response.redirect_url.should be_start_with 'https://api.twitter.com/oauth/authorize'
     end
   end
 
   describe "GET 'signin/done'" do
     it "should display an error message upon error" do
-      get 'signin_done'
+      get :signin_done
       response.should render_template('signin_err')
     end
   end

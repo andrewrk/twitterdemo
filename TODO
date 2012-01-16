@@ -1,3 +1,4 @@
+ * don't save request token as permanent cookie, save into session
  * better test coverage
  * better experience upon clicking the submit button - instead of timeout,
    actually analyze the success/failure results that come back.
@@ -6,3 +7,4 @@
  * better pagination
  * support for when more than 5000 followees/followers
  * look into signed cookies
+ * handle the case when the access tokens expire
