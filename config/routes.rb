@@ -1,8 +1,8 @@
 Twitterdemo::Application.routes.draw do
-    match '/signin/done' => 'main#signin_done'
-    match '/signin' => 'main#signin'
+  match '/signin/done' => 'main#signin_done'
+  match '/signin' => 'main#signin'
 
-    match '/api' => 'main#api'
+  match '/api' => 'main#api'
     
   # The priority is based upon order of creation:
   # first created -> highest priority.
@@ -51,7 +51,7 @@ Twitterdemo::Application.routes.draw do
   #     resources :products
   #   end
 
-    root :to => 'main#home'
+  root :to => 'main#home'
 
   # See how all your routes lay out with "rake routes"
 end
