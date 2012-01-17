@@ -1,6 +1,5 @@
  * better experience upon clicking the submit button - instead of timeout,
    actually analyze the success/failure results that come back.
- * need to sign in before showing search box
 
  * don't save request token as permanent cookie, save into session
  * better test coverage

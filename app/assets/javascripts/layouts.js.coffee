@@ -15,54 +15,66 @@ RTD.layouts.pagination = """
 """
 
 RTD.layouts.results = Jst.compile """
-<% if (results) { %>
+<% if (completed_actions != null) { %>
   <h1><%= label %></h1>
-  <div class="profiles">
-  <% if (results.length > 0) { %>
-    #{RTD.layouts.pagination}
-    <% for (var i = 0; i < results.length; i++) { %>
-      <div class="profile<%= i % 2 === 0 ? '' : ' odd' %>">
-        <div class="basic-info span-3">
-          <img alt="" src="<%= results[i].profile_image_url %>">
-          <div>
-            <a
-              href="https://twitter.com/#!/<%= results[i].screen_name %>"><%=
-                  results[i].name || results[i].screen_name %></a>
-          </div>
-        </div>
-        <div class="description span-12">
-          <% if (results[i].description) { %>
-            <%= results[i].description  %>
-          <% } else { %>
-            No description
-          <% } %>
-        </div>
-        <div class="actions span-3">
-          <input
-            type="checkbox"
-            data-id="<%= results[i].id %>"
-            class="action"
-            id="action-<%= results[i].id %>"
-            <% if (action_checked[results[i].id]) { %>
-              checked="checked"
-            <% } %>
-          >
-          <label for="action-<%= results[i].id %>"><%= action_label %></label>
-        </div>
-        <div class="clear"></div>
-      </div>
+  <ul>
+    <% for (var user_id in completed_actions) { %>
+      <li class="<%= completed_actions[user_id].success %>">
+        <%= completed_actions[user_id].name || completed_actions[user_id].screen_name %>
+      </li>
     <% } %>
-    <input type="button" value="Submit" class="submit">
-    #{RTD.layouts.pagination}
-  <% } else { %>
-    <p>No results.</p>
-  <% } %>
-  </div>
+  </ul>
+  <a href="#/">Back to Home</a>
 <% } else { %>
-  <% if (signed_in) { %>
-    <p>Loading...</p>
+  <% if (results) { %>
+    <h1><%= label %></h1>
+    <div class="profiles">
+    <% if (results.length > 0) { %>
+      #{RTD.layouts.pagination}
+      <% for (var i = 0; i < results.length; i++) { %>
+        <div class="profile<%= i % 2 === 0 ? '' : ' odd' %>">
+          <div class="basic-info span-3">
+            <img alt="" src="<%= results[i].profile_image_url %>">
+            <div>
+              <a
+                href="https://twitter.com/#!/<%= results[i].screen_name %>"><%=
+                    results[i].name || results[i].screen_name %></a>
+            </div>
+          </div>
+          <div class="description span-12">
+            <% if (results[i].description) { %>
+              <%= results[i].description  %>
+            <% } else { %>
+              No description
+            <% } %>
+          </div>
+          <div class="actions span-3">
+            <input
+              type="checkbox"
+              data-id="<%= results[i].id %>"
+              class="action"
+              id="action-<%= results[i].id %>"
+              <% if (action_checked[results[i].id]) { %>
+                checked="checked"
+              <% } %>
+            >
+            <label for="action-<%= results[i].id %>"><%= action_label %></label>
+          </div>
+          <div class="clear"></div>
+        </div>
+      <% } %>
+      <input type="button" value="Submit" class="submit">
+      #{RTD.layouts.pagination}
+    <% } else { %>
+      <p>No results.</p>
+    <% } %>
+    </div>
   <% } else { %>
-    <p>Not signed in</p>
+    <% if (signed_in) { %>
+      <p>Loading...</p>
+    <% } else { %>
+      <p>Not signed in</p>
+    <% } %>
   <% } %>
 <% } %>
 """

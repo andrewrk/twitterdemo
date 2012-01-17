@@ -44,32 +44,48 @@ class HomePage extends RTD.Page
         @current_page = parseInt(params.page) || 0
         @results_per_page = 20
         @friends = null
-        @unfollow_users = {} # users we want to unfollow (id => true/not true)
+        # users we want to unfollow (id => true/not true)
+        @unfollow_users = {}
+        # list of success/failure for following/unfollowing
+        @completed_actions = null
 
         if @signed_in
             @_requestFriends()
 
     canonicalUrl: ->
-        "/#/?page=" + @current_page
+        if @completed_actions?
+            return "/#/results"
+        else
+            "/#/?page=" + @current_page
+
+    _markAsNewPage: ->
+        history?.pushState {}, '', @canonicalUrl()
 
     render: ->
         super()
 
         # prepare data
-        if @friends?
-            start = @current_page * @results_per_page
-            end = start + @results_per_page
+        if @completed_actions?
             context =
-                results: (@users[id] for id in @friends.ids[start...end])
-                has_prev: start > 0
-                has_next: end < @friends.ids.length
-                action_checked: @unfollow_users
-                action_label: "Unfollow"
-                label: "Followees"
+                completed_actions: @completed_actions
+                label: "Unfollow results"
         else
-            context =
-                results: null
-                signed_in: @signed_in
+            if @friends?
+                start = @current_page * @results_per_page
+                end = start + @results_per_page
+                context =
+                    completed_actions: null
+                    results: (@users[id] for id in @friends.ids[start...end])
+                    has_prev: start > 0
+                    has_next: end < @friends.ids.length
+                    action_checked: @unfollow_users
+                    action_label: "Unfollow"
+                    label: "Followees"
+            else
+                context =
+                    completed_actions: null
+                    results: null
+                    signed_in: @signed_in
 
         # render templates
         content = $("#content")
@@ -79,13 +95,13 @@ class HomePage extends RTD.Page
         content.find(".nav-next").on 'click', (event) =>
             @current_page += 1
             @_requestCurrentPage()
-            history?.pushState {}, '', @canonicalUrl()
+            @_markAsNewPage()
             return false
 
         content.find(".nav-prev").on 'click', (event) =>
             @current_page -= 1
             @_requestCurrentPage()
-            history?.pushState {}, '', @canonicalUrl()
+            @_markAsNewPage()
             return false
 
         content.find(".action").on 'change', (event) =>
@@ -97,26 +113,37 @@ class HomePage extends RTD.Page
         
         content.find(".submit").on 'click', (event) =>
             # unfollow every checked user one by one
-            $(event.target).hide()
+            @completed_actions = {}
+            @_markAsNewPage()
+            @render()
             for own user_id, unfollow of @unfollow_users
                 if unfollow
-                    $.ajax
-                        type: 'POST'
-                        url: '/api'
-                        data:
-                            method: 'POST'
-                            path: '/friendships/destroy.json'
-                            post_params: JSON.stringify
-                                user_id: user_id
-                                include_entities: false
+                    @completed_actions[user_id] =
+                        success: 'notice'
+                        screen_name: @users[user_id].screen_name
+                        name: @users[user_id].name
+                    do (user_id) =>
+                        done = (success) =>
+                            @completed_actions[user_id].success = success
+                            @render()
+                        $.ajax
+                            type: 'POST'
+                            url: '/api'
+                            data:
+                                method: 'POST'
+                                path: '/friendships/destroy.json'
+                                post_params: JSON.stringify
+                                    user_id: user_id
+                                    include_entities: false
+                            success: (data) =>
+                                if data.error?
+                                    done 'error'
+                                else
+                                    done 'success'
+                            error: => done 'error'
+            @render()
 
             @unfollow_users = {}
-
-            setTimeout =>
-                @current_page = 0
-                @_requestCurrentPage()
-            , 1000
-
             return false
 
 RTD.HomePage = HomePage
