@@ -81,20 +81,20 @@ RTD.layouts.nav = Jst.compile """
     <li>
       <a class="signout" href="#">Sign out</a>
     </li>
+    <li>
+      <input
+          name="q"
+          type="text"
+          placeholder="Search"
+          class="search"
+          value="<%= query %>"
+      >
+    </li>
   <% } else { %>
     <li>
       <a href="/signin">Sign in</a>
     </li>
   <% } %>
-  <li>
-    <input
-        name="q"
-        type="text"
-        placeholder="Search"
-        class="search"
-        value="<%= query %>"
-    >
-  </li>
 </ul>
 """
 
