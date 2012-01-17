@@ -1,5 +1,4 @@
- * better experience upon clicking the submit button - instead of timeout,
-   actually analyze the success/failure results that come back.
+ * searches are happening twice
 
  * don't save request token as permanent cookie, save into session
  * better test coverage
