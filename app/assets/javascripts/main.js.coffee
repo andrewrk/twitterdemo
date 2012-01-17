@@ -31,7 +31,6 @@ $.address.change (event) -> handleNewPage(event.value)
 RTD.navToAddress = (address) ->
     force_update = $.address.value() == address
     $.address.value address
-    location.hash = address
 
     if force_update
         handleNewPage address

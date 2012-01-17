@@ -1,5 +1,3 @@
- * searches are happening twice
-
  * don't save request token as permanent cookie, save into session
  * better test coverage
  * pre-fetch next page of results for smooth experience
