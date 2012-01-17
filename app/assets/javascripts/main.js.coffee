@@ -29,7 +29,10 @@ handleNewPage = (address) ->
 $.address.change (event) -> handleNewPage(event.value)
 
 RTD.navToAddress = (address) ->
-    if $.address.value() == address
+    force_update = $.address.value() == address
+    $.address.value address
+    location.hash = address
+
+    if force_update
         handleNewPage address
-    else
-        $.address.value address
+
