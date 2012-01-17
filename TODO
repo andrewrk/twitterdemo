@@ -6,3 +6,4 @@
  * support for when more than 5000 followees/followers
  * look into signed cookies
  * handle the case when the access tokens expire
+ * sometimes url hash doesn't line up with the page you're on
